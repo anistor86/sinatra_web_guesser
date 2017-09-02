@@ -2,13 +2,32 @@ require 'sinatra'
 require 'sinatra/reloader'
 
 SECRET_NUMBER = rand(101)
-get '/' do
+@@remaining_guesses = 5
 
+get '/' do
   if params["guess"] != nil
-    guess = params["guess"].to_i
-    message = check_guess(guess)
+    @@remaining_guesses -= 1
+    if @@remaining_guesses > 0
+      guess = params["guess"].to_i
+      if check_guess(guess) == "You got it right! The number was #{SECRET_NUMBER}"
+        @@remaining_guesses = 5
+        message = check_guess(guess) + " Number changed, play again!"
+        background = check_background(message)
+        SECRET_NUMBER = rand(101)
+      else
+        message = check_guess(guess)
+        background = check_background(message)
+      end
+    elsif @@remaining_guesses == 0
+      SECRET_NUMBER = rand(101)
+      @@remaining_guesses = 5
+      background = "#FF1A1A"
+      message = "No more lives! You lose, number changed! Play again!"
+    end
+  else
+    background = "#FF1A1A"
   end
-  erb :index, :locals => {:number => SECRET_NUMBER, :message => message}
+  erb :index, :locals => {:number => SECRET_NUMBER, :message => message, :bgcolor => background, :remaining_guesses => @@remaining_guesses}
 
 end
 
@@ -23,5 +42,15 @@ def check_guess(guess)
     return "Too low!"
   elsif guess == SECRET_NUMBER
     return "You got it right! The number was #{SECRET_NUMBER}"
+  end
+end
+
+def check_background(message)
+  if message == "Way too high!" || message == "Way too low!"
+    return "#FF1A1A"
+  elsif message == "Too high!" || message == "Too low!"
+    return "#FF4D4D"
+  else
+    return "#33CC33"
   end
 end

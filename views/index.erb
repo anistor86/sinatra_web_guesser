@@ -1,5 +1,11 @@
 <html>
-<head></head>
+<head>
+  <style>
+    body {
+      background: <%= bgcolor %>;
+    }
+  </style>
+</head>
 <body>
   <p>
     Number guessing game...can you guess the number??
@@ -9,5 +15,6 @@
     <input type='submit' value='Guess!' />
   </form>
   <%= message %>
+  Remaining guesses <%= remaining_guesses %>
 </body>
 </html>
